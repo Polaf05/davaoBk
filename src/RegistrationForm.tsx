@@ -1,109 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import Modal from './components/Modal';
-import QrComponent from './components/QR Reader';
-import { philsysForm } from './lib/generics';
-import PocketBase from 'pocketbase';
-import dayjs from 'dayjs';
-import { WebcamComponent } from './components/WebcamReader';
-import { Stepper, Button, Group, FileInput } from '@mantine/core';
-import axios from 'axios';
-import sendData from './lib/api';
+import React, { useEffect, useState } from "react"
+import Modal from "./components/Modal"
+import QrComponent from "./components/QR Reader"
+import { philsysForm } from "./lib/generics"
+import PocketBase from "pocketbase"
+import dayjs from "dayjs"
+import { WebcamComponent } from "./components/WebcamReader"
+import { Stepper, Button, Group, FileInput } from "@mantine/core"
+import axios from "axios"
+import sendData from "./lib/api"
 
-const pb = new PocketBase('http://127.0.0.1:8090/');
+const pb = new PocketBase("http://127.0.0.1:8090/")
 
 const RegisterForm = () => {
+    const [qrVisible, setQrVisible] = useState<boolean>(false)
 
-    const [qrVisible, setQrVisible] = useState<boolean>(false);
+    const [camVisible, setCamVisible] = useState<boolean>(false)
 
-    const [camVisible, setCamVisible] = useState<boolean>(false);
+    const [screenshot, setScreenshot] = useState()
 
-    const [screenshot, setScreenshot] = useState();
+    const [active, setActive] = useState(0)
 
-    const [active, setActive] = useState(0);
+    const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current))
 
-    const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
+    const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current))
 
-    const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
+    const [pin, setPin] = useState(["", "", "", ""])
 
-    const [pin, setPin] = useState(['', '', '', '']);
+    const [confirmPin, setConfirmPin] = useState(["", "", "", ""])
 
-    const [confirmPin, setConfirmPin] = useState(['', '', '', '']);
+    const [match, setMatch] = useState(false)
 
-    const [match, setMatch] = useState(false);
+    const [pdfUrl, setPdfUrl] = useState(null)
 
     const [formData, setFormData] = useState<any>({
         DateIssued: new Date(),
         Issuer: "",
         subject: {
-            Suffix: '',
-            lName: '',
-            fName: '',
-            mName: '',
-            sex: '',
-            BF: '',
+            Suffix: "",
+            lName: "",
+            fName: "",
+            mName: "",
+            sex: "",
+            BF: "",
             DOB: new Date(),
-            POB: '',
-            PCN: '',
-            phone: '',
-            marital: '',
-            occupation: '',
+            POB: "",
+            PCN: "",
+            phone: "",
+            marital: "",
+            occupation: "",
         },
-        alg: '',
-        pin: '',
-        signature: ''
-    });
+        alg: "",
+        pin: "",
+        signature: "",
+    })
 
     const handleChange = (e: any) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+            [e.target.name]: e.target.value,
+        })
+    }
 
     const handlePinChange = (event: any, index: any) => {
-        const newPin = [...pin];
-        newPin[index] = event.target.value;
-        setPin(newPin);
+        const newPin = [...pin]
+        newPin[index] = event.target.value
+        setPin(newPin)
 
         if (event.target.value.length === 1 && index < 3) {
-            const nextInput = document.getElementById(`input-${index + 1}`);
-            nextInput?.focus();
+            const nextInput = document.getElementById(`input-${index + 1}`)
+            nextInput?.focus()
         }
 
         if (JSON.stringify(pin) === JSON.stringify(confirmPin)) {
-            setMatch(true);
+            setMatch(true)
         } else {
-            setMatch(false);
+            setMatch(false)
         }
-    };
-
-    function generateUID() {
-        return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
+    function generateUID() {
+        return Math.floor(100000 + Math.random() * 900000).toString()
+    }
 
     const handleConfirmPinChange = (event: any, index: any) => {
-        const newConfirmPin = [...confirmPin];
-        newConfirmPin[index] = event.target.value;
-        setConfirmPin(newConfirmPin);
+        const newConfirmPin = [...confirmPin]
+        newConfirmPin[index] = event.target.value
+        setConfirmPin(newConfirmPin)
 
         if (event.target.value.length === 1 && index < 3) {
-            const nextInput = document.getElementById(`confirm-input-${index + 1}`);
-            nextInput?.focus();
+            const nextInput = document.getElementById(`confirm-input-${index + 1}`)
+            nextInput?.focus()
         }
 
         if (JSON.stringify(pin) === JSON.stringify(newConfirmPin)) {
-            setMatch(true);
+            setMatch(true)
         } else {
-            setMatch(false);
+            setMatch(false)
         }
-    };
+    }
 
     const parseDate = (dateString: Date) => {
-        const parsedDate = new Date(dateString + " 12:00:00");
-        const convertedDate = parsedDate.toISOString();
+        const parsedDate = new Date(dateString + " 12:00:00")
+        const convertedDate = parsedDate.toISOString()
 
-        return convertedDate;
+        return convertedDate
     }
 
     const handleSubjectChange = (e: any) => {
@@ -111,23 +111,27 @@ const RegisterForm = () => {
             ...formData,
             subject: {
                 ...formData.subject,
-                [e.target.name]: e.target.value
-            }
-        });
-    };
+                [e.target.name]: e.target.value,
+            },
+        })
+    }
 
     const handleSubmit = async (e: any) => {
-        e.preventDefault();
+        e.preventDefault()
 
-        let flag = true;
-        let count = 0;
+        let flag = true
+        let count = 0
 
         while (flag && count < 10) {
-            if (formData.subject.phone === "" || formData.subject.phone === null || formData.subject.phone === undefined) {
-                formData.subject.phone = generateUID();
+            if (
+                formData.subject.phone === "" ||
+                formData.subject.phone === null ||
+                formData.subject.phone === undefined
+            ) {
+                formData.subject.phone = generateUID()
             }
             console.log("ikot")
-            count++;
+            count++
             const insertData = {
                 f_name: formData.subject.fName,
                 l_name: formData.subject.lName,
@@ -139,14 +143,20 @@ const RegisterForm = () => {
                 password: pin.join(""),
             }
 
-
-            let rsp: any = await sendData(screenshot, insertData);
-            console.log(rsp);
+            let rsp: any = await sendData(screenshot, insertData)
+            console.log(rsp)
 
             if (rsp === "success") {
-                flag = false;
+                flag = false
                 const pocketData = {
-                    fullname: formData.subject.lName + " " + formData.subject.fName + " " + formData.subject.mName + " " + formData.subject.Suffix,
+                    fullname:
+                        formData.subject.lName +
+                        " " +
+                        formData.subject.fName +
+                        " " +
+                        formData.subject.mName +
+                        " " +
+                        formData.subject.Suffix,
                     fullname_data: {
                         fName: formData.subject.fName,
                         lName: formData.subject.lName,
@@ -166,14 +176,116 @@ const RegisterForm = () => {
                     // image: screenshot,
                     alg: formData.alg,
                 }
-                console.log(insertData)
-                const record = await pb.collection('constituents').create(pocketData
 
-                ).then(() => { console.log("nice") }).catch((e) => { console.log(e) })
-                console.log(formData);
+                const formDataX = new FormData()
+
+                formDataX.append("fullname", pocketData.fullname)
+                formDataX.append("fullname_data", JSON.stringify(pocketData.fullname_data))
+                formDataX.append("dob", pocketData.dob)
+                formDataX.append("suffix", pocketData.suffix)
+                formDataX.append("bf", pocketData.bf)
+                formDataX.append("pcn", pocketData.pcn)
+                formDataX.append("pob", pocketData.pob)
+                formDataX.append("date_issued", pocketData.date_issued)
+                formDataX.append("sex", pocketData.sex)
+                formDataX.append("occupation", pocketData.occupation)
+                formDataX.append("phone", pocketData.phone)
+                formDataX.append("marital", pocketData.marital)
+                formDataX.append("alg", pocketData.alg)
+
+                const newImage = base64ConvertToFile(screenshot ?? "")
+                formDataX.append("picture", newImage)
+
+                console.log(insertData)
+                const record = await pb
+                    .collection("constituents")
+                    .create(formDataX)
+                    .then((res) => {
+                        console.log("nice")
+                        console.log(res)
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                    })
+
+                const formDataX2 = new FormData()
+                formDataX2.append("file", newImage)
+                formDataX2.append("name", pocketData.fullname)
+                formDataX2.append("address", "Dagat-Dagatan, Caloocan Metro Manila")
+                formDataX2.append("dob", pocketData.dob)
+                formDataX2.append("date_issue", pocketData.date_issued)
+                formDataX2.append("marital_status", pocketData.marital)
+                formDataX2.append("gender", pocketData.sex)
+                formDataX2.append("phone", pocketData.phone)
+                formDataX2.append("philsys_data", JSON.stringify(pocketData))
+
+                axios
+                    .post("http://127.0.0.1:3000", formDataX2, {
+                        responseType: "blob",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    })
+                    .then((response) => {
+                        //@ts-ignore
+                        setPdfUrl(URL.createObjectURL(response.data))
+                    })
             }
         }
-    };
+    }
+
+    const handleGeneratePdf = () => {
+        const formDataX2 = new FormData()
+        const newImage = base64ConvertToFile(screenshot ?? "")
+        formDataX2.append("file", newImage)
+        formDataX2.append(
+            "name",
+            formData.subject.lName +
+                " " +
+                formData.subject.fName +
+                " " +
+                formData.subject.mName +
+                " " +
+                formData.subject.Suffix
+        )
+        formDataX2.append("address", "Dagat-Dagatan, Caloocan Metro Manila")
+        formDataX2.append("dob", formData.subject.DOB)
+        formDataX2.append("date_issue", formData.DateIssued)
+        formDataX2.append("marital_status", formData.subject.marital)
+        formDataX2.append("gender", formData.subject.sex)
+        formDataX2.append("phone", formData.subject.phone)
+        formDataX2.append("philsys_data", JSON.stringify(formData))
+
+        for (const [key, value] of formDataX2.entries()) {
+            console.log(key, value)
+        }
+
+        axios
+            .postForm("http://localhost:3000", formDataX2, {
+                responseType: "blob",
+                // headers: {
+                //     "Content-Type": "multipart/form-data",
+                // },
+            })
+            .then((response) => {
+                //@ts-ignore
+                setPdfUrl(URL.createObjectURL(response.data))
+            })
+    }
+
+    const base64ConvertToFile = (base64Image: string) => {
+        // Extract the MIME type and base64 data from the image string
+        let [mimeType, imageData] = base64Image.split(",")
+
+        // Create a Blob from the base64 data
+        let binary = atob(imageData)
+        let array = []
+        for (let i = 0; i < binary.length; i++) {
+            array.push(binary.charCodeAt(i))
+        }
+        let file = new Blob([new Uint8Array(array)], { type: mimeType })
+        return file
+    }
 
     // useEffect(() => {
     //     if (pin !== confirmPin) {
@@ -189,21 +301,28 @@ const RegisterForm = () => {
             <form onSubmit={handleSubmit}>
                 <Stepper active={active} breakpoint="sm">
                     <Stepper.Step label="First step" description="Create an account">
-                        <Modal title={'QR READER'} isVisible={qrVisible} setIsVisible={setQrVisible} className={'max-w-sm'}>
-                            <div>
-                                {qrVisible && <QrComponent formData={formData} setFormData={setFormData} />}
-                            </div>
+                        <Modal
+                            title={"QR READER"}
+                            isVisible={qrVisible}
+                            setIsVisible={setQrVisible}
+                            className={"max-w-sm"}
+                        >
+                            <div>{qrVisible && <QrComponent formData={formData} setFormData={setFormData} />}</div>
                         </Modal>
-                        <div className='flex justify-end space-x-2'>
-                            <button type='button' className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setQrVisible(true)}> Scan QR Code</button>
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                type="button"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={() => setQrVisible(true)}
+                            >
+                                {" "}
+                                Scan QR Code
+                            </button>
                         </div>
                         <div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="DateIssued"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="DateIssued">
                                         Date Issued
                                     </label>
                                     <input
@@ -218,10 +337,7 @@ const RegisterForm = () => {
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="Suffix"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="Suffix">
                                         Suffix
                                     </label>
                                     <input
@@ -234,10 +350,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="lName"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="lName">
                                         Last Name
                                     </label>
                                     <input
@@ -250,10 +363,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="fName"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="fName">
                                         First Name
                                     </label>
                                     <input
@@ -266,10 +376,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="mName"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="mName">
                                         Middle Name
                                     </label>
                                     <input
@@ -283,12 +390,8 @@ const RegisterForm = () => {
                                 </div>
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
-
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="sex"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="sex">
                                         Sex
                                     </label>
                                     <input
@@ -301,10 +404,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="BF"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="BF">
                                         BF
                                     </label>
                                     <input
@@ -317,10 +417,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="phone"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="phone">
                                         Phone Number
                                     </label>
                                     <input
@@ -333,10 +430,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="marital"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="marital">
                                         Marital Status
                                     </label>
                                     <input
@@ -351,10 +445,7 @@ const RegisterForm = () => {
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="DOB"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="DOB">
                                         Date of Birth
                                     </label>
                                     <input
@@ -367,10 +458,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="POB"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="POB">
                                         Place of Birth
                                     </label>
                                     <input
@@ -383,10 +471,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="PCN"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="PCN">
                                         PCN
                                     </label>
                                     <input
@@ -399,10 +484,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label
-                                        className="block font-medium mb-2 text-gray-700"
-                                        htmlFor="occupation"
-                                    >
+                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="occupation">
                                         Occupation
                                     </label>
                                     <input
@@ -414,14 +496,18 @@ const RegisterForm = () => {
                                         onChange={handleSubjectChange}
                                     />
                                 </div>
-
                             </div>
                         </div>
                     </Stepper.Step>
                     <Stepper.Step label="Second step" description="ID Picture">
-
-                        <div className='flex justify-center m-4 flex-col'>
-                            <button type='button' className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setCamVisible(true)}>Take Picture</button>
+                        <div className="flex justify-center m-4 flex-col">
+                            <button
+                                type="button"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={() => setCamVisible(true)}
+                            >
+                                Take Picture
+                            </button>
 
                             {/* <FileInput
                                 placeholder="Pick file"
@@ -431,17 +517,17 @@ const RegisterForm = () => {
                                 onChange={(e) => { console.log(e); setScreenshot(e) }}
                                 withAsterisk
                             /> */}
-                            <img className='m-4' src={screenshot} />
+                            <img className="m-4" src={screenshot} />
                         </div>
                     </Stepper.Step>
 
                     <Stepper.Step label="Final step" description="Get full access">
-                        <div className='flex items-center flex-col'>
+                        <div className="flex items-center flex-col">
                             <div className="mb-4 flex flex-col justify-center">
                                 <label className="block font-bold mb-2 text-gray-700" htmlFor="pin">
                                     Pin
                                 </label>
-                                <div className='flex-row'>
+                                <div className="flex-row">
                                     {pin.map((digit, index) => (
                                         <input
                                             key={index}
@@ -460,7 +546,7 @@ const RegisterForm = () => {
                                 <label className="block font-bold mb-2 text-gray-700" htmlFor="confirmPin">
                                     Confirm Pin
                                 </label>
-                                <div className='flex-row'>
+                                <div className="flex-row">
                                     {confirmPin.map((digit, index) => (
                                         <input
                                             key={index}
@@ -476,37 +562,59 @@ const RegisterForm = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className='flex items-center flex-col'>
+                        <div className="flex items-center flex-col">
                             {match ? (
                                 <p className="text-green-500 mt-2">Pins match</p>
                             ) : (
                                 <p className="text-red-500 mt-2">Pins do not match</p>
                             )}
                         </div>
+                        <div className="btn" onClick={handleGeneratePdf}>
+                            generate pdf
+                        </div>
+                        <div className="h-[700px]">
+                            {pdfUrl ? <DisplayPDF pdfUrl={pdfUrl} /> : <p>Loading PDF...</p>}
+                        </div>
                     </Stepper.Step>
                 </Stepper>
 
-
-
-                <Modal isVisible={camVisible} setIsVisible={setCamVisible} title='Id Picture' className='max-w-xl'>
+                <Modal isVisible={camVisible} setIsVisible={setCamVisible} title="Id Picture" className="max-w-xl">
                     <WebcamComponent screenshot={screenshot} setScreenshot={setScreenshot} />
                 </Modal>
 
                 <Group position="center" mt="xl">
-                    {active > 0 && <p className="hover:underline hover:cursor-pointer" onClick={prevStep}>Back</p>}
-                    {active < 2 && <button type="button" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={nextStep}>Next step</button>}
-                    {active === 2 && <div className="text-right">
+                    {active > 0 && (
+                        <p className="hover:underline hover:cursor-pointer" onClick={prevStep}>
+                            Back
+                        </p>
+                    )}
+                    {active < 2 && (
                         <button
-                            type="submit"
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+                            type="button"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick={nextStep}
                         >
-                            Submit
+                            Next step
                         </button>
-                    </div>}
+                    )}
+                    {active === 2 && (
+                        <div className="text-right">
+                            <button
+                                type="submit"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    )}
                 </Group>
             </form>
         </div>
-    );
-};
+    )
+}
 
-export default RegisterForm;
+export default RegisterForm
+
+function DisplayPDF({ pdfUrl }: any) {
+    return <object data={pdfUrl} type="application/pdf" width="100%" height="100%" />
+}
