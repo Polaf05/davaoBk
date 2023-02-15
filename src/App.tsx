@@ -7,7 +7,7 @@ function App() {
 
   return (
     <div className="flex justify-center">
-      <div className='bg-base-200 p-6 rounded-md m-5'>
+      <div className='bg-base-200 p-6 rounded-md m-5 w-full'>
         <RegisterForm />
       </div>
 

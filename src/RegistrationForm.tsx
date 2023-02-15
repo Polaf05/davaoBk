@@ -8,6 +8,8 @@ import { WebcamComponent } from "./components/WebcamReader"
 import { Stepper, Button, Group, FileInput } from "@mantine/core"
 import axios from "axios"
 import sendData from "./lib/api"
+import { Signature } from "./components/Signature"
+import { DatePicker } from "@mantine/dates"
 
 const pb = new PocketBase("http://127.0.0.1:8090/")
 
@@ -18,7 +20,15 @@ const RegisterForm = () => {
 
     const [screenshot, setScreenshot] = useState()
 
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+    const [signature, setSignature] = useState(null);
+
     const [active, setActive] = useState(0)
+
+    const [dateIssue, setDateIssued] = useState<Date | null>(null);
+
+    const [dob, setDOB] = useState<Date | null>(null);
 
     const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current))
 
@@ -33,7 +43,7 @@ const RegisterForm = () => {
     const [pdfUrl, setPdfUrl] = useState(null)
 
     const [formData, setFormData] = useState<any>({
-        DateIssued: new Date(),
+        DateIssued: null,
         Issuer: "",
         subject: {
             Suffix: "",
@@ -42,12 +52,14 @@ const RegisterForm = () => {
             mName: "",
             sex: "",
             BF: "",
-            DOB: new Date(),
+            DOB: null,
             POB: "",
             PCN: "",
             phone: "",
             marital: "",
             occupation: "",
+            address: "",
+            benefits: [],
         },
         alg: "",
         pin: "",
@@ -115,6 +127,13 @@ const RegisterForm = () => {
             },
         })
     }
+    const handleOptionChange = (event: any) => {
+        if (selectedOptions.includes(event.target.value)) {
+            setSelectedOptions(selectedOptions.filter((item) => item !== event.target.value));
+        } else {
+            setSelectedOptions([...selectedOptions, event.target.value]);
+        }
+    };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault()
@@ -192,9 +211,12 @@ const RegisterForm = () => {
                 formDataX.append("phone", pocketData.phone)
                 formDataX.append("marital", pocketData.marital)
                 formDataX.append("alg", pocketData.alg)
+                formDataX.append("benefits", selectedOptions.toString())
 
                 const newImage = base64ConvertToFile(screenshot ?? "")
+                const newSignature = base64ConvertToFile(signature ?? "")
                 formDataX.append("picture", newImage)
+                formDataX.append("signature", newSignature);
 
                 console.log(insertData)
                 const record = await pb
@@ -210,6 +232,7 @@ const RegisterForm = () => {
 
                 const formDataX2 = new FormData()
                 formDataX2.append("file", newImage)
+                formDataX2.append("signature", newSignature)
                 formDataX2.append("name", pocketData.fullname)
                 formDataX2.append("address", "Dagat-Dagatan, Caloocan Metro Manila")
                 formDataX2.append("dob", pocketData.dob)
@@ -241,12 +264,12 @@ const RegisterForm = () => {
         formDataX2.append(
             "name",
             formData.subject.lName +
-                " " +
-                formData.subject.fName +
-                " " +
-                formData.subject.mName +
-                " " +
-                formData.subject.Suffix
+            " " +
+            formData.subject.fName +
+            " " +
+            formData.subject.mName +
+            " " +
+            formData.subject.Suffix
         )
         formDataX2.append("address", "Dagat-Dagatan, Caloocan Metro Manila")
         formDataX2.append("dob", formData.subject.DOB)
@@ -297,7 +320,7 @@ const RegisterForm = () => {
     // }, [pin, confirmPin])
 
     return (
-        <div>
+        <div className="">
             <form onSubmit={handleSubmit}>
                 <Stepper active={active} breakpoint="sm">
                     <Stepper.Step label="First step" description="Create an account">
@@ -315,189 +338,253 @@ const RegisterForm = () => {
                                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                                 onClick={() => setQrVisible(true)}
                             >
-                                {" "}
-                                Scan QR Code
+                                Integrate Philsys Information
                             </button>
                         </div>
                         <div>
-                            <div className="flex flex-col md:flex-row mb-4">
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="DateIssued">
-                                        Date Issued
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="DateIssued"
-                                        id="DateIssued"
-                                        className="form-input w-full"
-                                        value={formData.DateIssued}
-                                        onChange={handleChange}
-                                    />
-                                </div>
+                            <div className="py-4">
+                                <p className="text-xl font-bold">Personal Information</p>
+                                <hr />
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="Suffix">
-                                        Suffix
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="Suffix"
-                                        id="Suffix"
-                                        className="form-input w-full"
-                                        value={formData.subject.Suffix}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="lName">
-                                        Last Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="lName"
-                                        id="lName"
-                                        className="form-input w-full"
-                                        value={formData.subject.lName}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="fName">
-                                        First Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="fName"
-                                        id="fName"
-                                        className="form-input w-full"
-                                        value={formData.subject.fName}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="mName">
-                                        Middle Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="mName"
-                                        id="mName"
-                                        className="form-input w-full"
-                                        value={formData.subject.mName}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex flex-col md:flex-row mb-4">
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="sex">
-                                        Sex
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="sex"
-                                        id="sex"
-                                        className="form-input w-full"
-                                        value={formData.subject.sex}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="BF">
-                                        BF
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="BF"
-                                        id="BF"
-                                        className="form-input w-full"
-                                        value={formData.subject.BF}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="phone">
-                                        Phone Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="phone"
-                                        id="phone"
-                                        className="form-input w-full"
-                                        value={formData.subject.phone}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="marital">
-                                        Marital Status
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="marital"
-                                        id="marital"
-                                        className="form-input w-full"
-                                        value={formData.subject.marital}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex flex-col md:flex-row mb-4">
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="DOB">
-                                        Date of Birth
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="DOB"
-                                        id="DOB"
-                                        className="form-input w-full"
-                                        value={formData.subject.DOB}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="POB">
-                                        Place of Birth
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="POB"
-                                        id="POB"
-                                        className="form-input w-full"
-                                        value={formData.subject.POB}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="PCN">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="PCN">
                                         PCN
                                     </label>
                                     <input
                                         type="text"
                                         name="PCN"
-                                        id="PCN"
-                                        className="form-input w-full"
+                                        id="PCN" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
                                         value={formData.subject.PCN}
                                         onChange={handleSubjectChange}
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block font-medium mb-2 text-gray-700" htmlFor="occupation">
-                                        Occupation
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="DateIssued">
+                                        Date Issued
+                                    </label>
+                                    {/* <input
+                                        type="text"
+                                        name="DateIssued"
+                                        id="DateIssued"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={formData.DateIssued}
+                                        onChange={handleChange}
+                                    /> */}
+                                    <DatePicker placeholder="Pick date" withAsterisk onChange={setDateIssued} value={dateIssue} size="md" />
+                                </div>
+                            </div>
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="lName">
+                                        Last Name
                                     </label>
                                     <input
                                         type="text"
-                                        name="occupation"
-                                        id="occupation"
-                                        className="form-input w-full"
-                                        value={formData.subject.occupation}
+                                        name="lName"
+                                        id="lName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.lName}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="fName">
+                                        First Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="fName"
+                                        id="fName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.fName}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="mName">
+                                        Middle Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="mName"
+                                        id="mName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.mName}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                                <div className="w-1/12 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="Suffix">
+                                        Suffix
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="Suffix"
+                                        id="Suffix" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.Suffix}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="DOB">
+                                        Date of Birth
+                                    </label>
+                                    <DatePicker placeholder="Pick date" withAsterisk onChange={setDOB} value={dob} size="md" />
+                                </div>
+
+                                <div className="md:w-1/6 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="sex">
+                                        Sex
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="sex"
+                                        id="sex" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.sex}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+
+
+                            </div>
+
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="w-full mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="POB">
+                                        Place of Birth
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="POB"
+                                        id="POB" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.POB}
                                         onChange={handleSubjectChange}
                                     />
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <div className="py-4">
+                                <p className="text-xl font-bold">Other Information</p>
+                                <hr />
+                            </div>
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="phone">
+                                        Phone Number
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        id="phone" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.phone}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="occupation">
+                                        Occupation
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="occupation"
+                                        id="occupation" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                                        value={formData.subject.occupation}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="w-full mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="address">
+                                        Permanent Address
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        id="address"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={formData.subject.address}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Beneficiaries</p>
+                            </div>
+                            <div className="flex flex-row space-x-4 py-2">
+                                <div className="flex items-center">
+                                    <input
+                                        id="checked-scholar"
+                                        type="checkbox"
+                                        value="Scholar"
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectedOptions.includes('Scholar')}
+                                        onChange={handleOptionChange} />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Scholar</label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="checked-4ps"
+                                        type="checkbox"
+                                        value="4ps"
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectedOptions.includes('4ps')}
+                                        onChange={handleOptionChange} />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">4p's</label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="checked-senior"
+                                        type="checkbox"
+                                        value="Senior"
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectedOptions.includes('Senior')}
+                                        onChange={handleOptionChange} />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Senior</label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="checked-sap"
+                                        type="checkbox"
+                                        value="Sap"
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectedOptions.includes('Sap')}
+                                        onChange={handleOptionChange} />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">SAP</label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="checked-single"
+                                        type="checkbox"
+                                        value="Single"
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectedOptions.includes('Single')}
+                                        onChange={handleOptionChange} />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Single Parent</label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="checked-pwd"
+                                        type="checkbox"
+                                        value="Pwd"
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectedOptions.includes('Pwd')}
+                                        onChange={handleOptionChange} />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Person with Disability</label>
+                                </div>
+                            </div>
+                        </div>
+
                     </Stepper.Step>
                     <Stepper.Step label="Second step" description="ID Picture">
                         <div className="flex justify-center m-4 flex-col">
@@ -509,6 +596,8 @@ const RegisterForm = () => {
                                 Take Picture
                             </button>
 
+                            <img className="m-4 h-96 w-96" src={screenshot} />
+
                             {/* <FileInput
                                 placeholder="Pick file"
                                 label="Upload Picture"
@@ -517,11 +606,17 @@ const RegisterForm = () => {
                                 onChange={(e) => { console.log(e); setScreenshot(e) }}
                                 withAsterisk
                             /> */}
-                            <img className="m-4" src={screenshot} />
+                            <div className="my-5">
+                                <p className="text-xl font-bold">User Signature</p>
+                                <hr />
+                                <div className="my-4">
+                                    <Signature signature={signature} setSignature={setSignature} />
+                                </div>
+                            </div>
                         </div>
                     </Stepper.Step>
 
-                    <Stepper.Step label="Final step" description="Get full access">
+                    <Stepper.Step label="Third Step" description="Add wallet pin">
                         <div className="flex items-center flex-col">
                             <div className="mb-4 flex flex-col justify-center">
                                 <label className="block font-bold mb-2 text-gray-700" htmlFor="pin">
@@ -569,11 +664,16 @@ const RegisterForm = () => {
                                 <p className="text-red-500 mt-2">Pins do not match</p>
                             )}
                         </div>
-                        <div className="btn" onClick={handleGeneratePdf}>
-                            generate pdf
-                        </div>
-                        <div className="h-[700px]">
-                            {pdfUrl ? <DisplayPDF pdfUrl={pdfUrl} /> : <p>Loading PDF...</p>}
+
+                    </Stepper.Step>
+                    <Stepper.Step label="Fourth Step" description="Confirmation">
+                        <div className="flex justify-center m-4 flex-col">
+                            <div className="btn" onClick={handleGeneratePdf}>
+                                generate pdf
+                            </div>
+                            <div className="h-[700px]">
+                                {pdfUrl && <DisplayPDF pdfUrl={pdfUrl} />}
+                            </div>
                         </div>
                     </Stepper.Step>
                 </Stepper>
@@ -588,7 +688,7 @@ const RegisterForm = () => {
                             Back
                         </p>
                     )}
-                    {active < 2 && (
+                    {active < 3 && (
                         <button
                             type="button"
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -597,7 +697,7 @@ const RegisterForm = () => {
                             Next step
                         </button>
                     )}
-                    {active === 2 && (
+                    {active === 3 && (
                         <div className="text-right">
                             <button
                                 type="submit"
@@ -618,3 +718,5 @@ export default RegisterForm
 function DisplayPDF({ pdfUrl }: any) {
     return <object data={pdfUrl} type="application/pdf" width="100%" height="100%" />
 }
+
+
