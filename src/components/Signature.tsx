@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactSignatureCanvas from 'react-signature-canvas';
 
-export const Signature = (props: { signature: any, setSignature: any }) => {
+export const Signature = (props: { signature: any, setSignature: any, }) => {
     const [trimmedDataURL, setTrimmedDataURL] = useState<string | null>(null);
 
     const [image, setImage] = useState("");
@@ -45,8 +45,8 @@ export const Signature = (props: { signature: any, setSignature: any }) => {
                     />
                 </div>
                 <div className="flex flex-row items-center w-full content-center justify-center gap-5">
-                    <button onClick={handleSave}>Save Signature</button>
-                    <button onClick={handleClear}>Clear Signature</button>
+                    <button type="button" onClick={handleSave}>Save Signature</button>
+                    <button type="button" onClick={handleClear}>Clear Signature</button>
                 </div>
             </div>
         </div>

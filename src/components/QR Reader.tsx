@@ -5,6 +5,7 @@ import { philsysForm } from '../lib/generics';
 const QrComponent = (props: {
     formData: any,
     setFormData: any,
+    setIsVisible: any,
 }) => {
     const [data, setData] = useState<any>(null);
     const [facing, setFacing] = useState<boolean>(false);
@@ -16,6 +17,7 @@ const QrComponent = (props: {
             if (data?.data) {
                 try {
                     props.setFormData(data?.data)
+                    props.setIsVisible(false);
                 } catch (error) {
                     console.log("mali")
                 }
@@ -40,7 +42,6 @@ const QrComponent = (props: {
                         try {
                             // @ts-ignore
                             const data: any = JSON.parse(result?.text);
-                            console.info("tite: ", data.data);
                             setData({
                                 message: "Success Decoding",
                                 data: data,
@@ -63,8 +64,6 @@ const QrComponent = (props: {
                 // @ts-ignore
                 style={{ width: "100%" }}
             />}
-            {/* <p>{data}</p> */}
-            {data?.data && <pre>{JSON.stringify(data?.data, null, 2)}</pre>}
         </>
     );
 };

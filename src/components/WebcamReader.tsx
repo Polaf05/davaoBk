@@ -3,7 +3,8 @@ import Webcam from "react-webcam";
 
 export const WebcamComponent = (props: {
     screenshot: any,
-    setScreenshot: any
+    setScreenshot: any,
+    setIsVisible: any
 }) => {
 
     const videoConstraints = {
@@ -18,6 +19,7 @@ export const WebcamComponent = (props: {
         //@ts-ignore
         const imageSrc = webcamRef.current.getScreenshot();
         props.setScreenshot(imageSrc);
+        props.setIsVisible(false);
     };
 
 
@@ -31,8 +33,7 @@ export const WebcamComponent = (props: {
                 width={1280}
                 videoConstraints={videoConstraints}
             />
-            <button onClick={handleClick}>Take Screenshot</button>
-            {props.screenshot && <img src={props.screenshot} />}
+            <button type="button" onClick={handleClick}>Take Screenshot</button>
         </div>
     )
 };
