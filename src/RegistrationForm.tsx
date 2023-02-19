@@ -305,7 +305,7 @@ const RegisterForm = () => {
         }
 
         axios
-            .postForm("http://api.davao.monggihub.com", formDataX2, {
+            .postForm("https://api.davao.monggihub.com", formDataX2, {
                 responseType: "blob",
                 // headers: {
                 //     "Content-Type": "multipart/form-data",
