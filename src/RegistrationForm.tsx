@@ -29,15 +29,15 @@ const RegisterForm = () => {
 
     const [screenshot, setScreenshot] = useState()
 
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
-    const [signature, setSignature] = useState(null);
+    const [signature, setSignature] = useState(null)
 
     const [active, setActive] = useState(0)
 
-    const [dateIssue, setDateIssued] = useState<Date | null>(new Date());
+    const [dateIssue, setDateIssued] = useState<Date | null>(new Date())
 
-    const [dob, setDOB] = useState<Date | null>(null);
+    const [dob, setDOB] = useState<Date | null>(null)
 
     const nextStep = () => setActive((current) => (current < 4 ? current + 1 : current))
 
@@ -201,11 +201,11 @@ const RegisterForm = () => {
     }
     const handleOptionChange = (event: any) => {
         if (selectedOptions.includes(event.target.value)) {
-            setSelectedOptions(selectedOptions.filter((item) => item !== event.target.value));
+            setSelectedOptions(selectedOptions.filter((item) => item !== event.target.value))
         } else {
-            setSelectedOptions([...selectedOptions, event.target.value]);
+            setSelectedOptions([...selectedOptions, event.target.value])
         }
-    };
+    }
 
     const handleSubmit = async (e: any) => {
         e.preventDefault()
@@ -290,7 +290,7 @@ const RegisterForm = () => {
                 const newImage = base64ConvertToFile(screenshot ?? "")
                 const newSignature = base64ConvertToFile(signature ?? "")
                 formDataX.append("picture", newImage)
-                formDataX.append("signature", newSignature);
+                formDataX.append("signature", newSignature)
 
                 console.log(insertData)
                 const record = await pb
@@ -338,7 +338,7 @@ const RegisterForm = () => {
     const handleGeneratePdf = () => {
         const formDataX2 = new FormData()
         const newImage = base64ConvertToFile(screenshot ?? "")
-        const newSign = base64ConvertToFile(signature ?? "");
+        const newSign = base64ConvertToFile(signature ?? "")
         formDataX2.append("file", newImage)
         formDataX2.append("file1", newSign)
         formDataX2.append(
@@ -448,7 +448,15 @@ const RegisterForm = () => {
                             setIsVisible={setQrVisible}
                             className={"max-w-sm"}
                         >
-                            <div>{qrVisible && <QrComponent formData={formData} setFormData={setFormData} setIsVisible={setQrVisible} />}</div>
+                            <div>
+                                {qrVisible && (
+                                    <QrComponent
+                                        formData={formData}
+                                        setFormData={setFormData}
+                                        setIsVisible={setQrVisible}
+                                    />
+                                )}
+                            </div>
                         </Modal>
 
                         <div className="flex justify-end space-x-2">
@@ -473,8 +481,8 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="PCN"
-                                        id="PCN" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-
+                                        id="PCN"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.PCN}
                                         onChange={handleSubjectChange}
                                     />
@@ -483,15 +491,19 @@ const RegisterForm = () => {
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DateIssued">
                                         Date Issued
                                     </label>
-                                    <DatePicker withAsterisk onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            DateIssued: e,
-
-                                        })
-                                    }} value={new Date(formData.DateIssued)} size="md" />
+                                    <DatePicker
+                                        withAsterisk
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                DateIssued: e,
+                                            })
+                                        }}
+                                        value={new Date(formData.DateIssued)}
+                                        size="md"
+                                    />
                                 </div>
-                            </div>
+                            </div >
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="lName">
@@ -500,8 +512,8 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="lName"
-                                        id="lName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-
+                                        id="lName"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.lName}
                                         onChange={handleSubjectChange}
                                     />
@@ -513,8 +525,8 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="fName"
-                                        id="fName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-
+                                        id="fName"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.fName}
                                         onChange={handleSubjectChange}
                                     />
@@ -526,8 +538,8 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="mName"
-                                        id="mName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-
+                                        id="mName"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.mName}
                                         onChange={handleSubjectChange}
                                     />
@@ -539,28 +551,33 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="Suffix"
-                                        id="Suffix" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-
+                                        id="Suffix"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.Suffix}
                                         onChange={handleSubjectChange}
                                     />
                                 </div>
-                            </div>
+                            </div >
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DOB">
                                         Date of Birth
                                     </label>
-                                    <DatePicker placeholder="Pick date" withAsterisk onChange={(val) => {
-                                        setFormData({
-                                            ...formData,
-                                            subject: {
-                                                ...formData.subject,
-                                                DOB: val,
-                                            }
-
-                                        })
-                                    }} value={new Date(formData.subject.DOB)} size="md" />
+                                    <DatePicker
+                                        placeholder="Pick date"
+                                        withAsterisk
+                                        onChange={(val) => {
+                                            setFormData({
+                                                ...formData,
+                                                subject: {
+                                                    ...formData.subject,
+                                                    DOB: val,
+                                                },
+                                            })
+                                        }}
+                                        value={new Date(formData.subject.DOB)}
+                                        size="md"
+                                    />
                                 </div>
 
                                 <div className="md:w-1/6 mr-4">
@@ -570,15 +587,13 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="sex"
-                                        id="sex" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-
+                                        id="sex"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.sex}
                                         onChange={handleSubjectChange}
                                     />
                                 </div>
-
-
-                            </div>
+                            </div >
 
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="w-full mr-4">
@@ -588,13 +603,14 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="POB"
-                                        id="POB" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        id="POB"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.POB}
                                         onChange={handleSubjectChange}
                                     />
                                 </div>
                             </div>
-                        </div>
+                        </div >
                         <div>
                             <div className="py-4">
                                 <p className="text-xl font-bold">Other Information</p>
@@ -608,7 +624,8 @@ const RegisterForm = () => {
                                     <input
                                         type="text"
                                         name="phone"
-                                        id="phone" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        id="phone"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={formData.subject.phone}
                                         onChange={handleSubjectChange}
                                     />
@@ -644,7 +661,6 @@ const RegisterForm = () => {
                                             </option>
                                         ))}
                                     </select>
-
                                 </div>
                                 <div className="md:w-1/3 mr-4">
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="marital">
@@ -664,7 +680,7 @@ const RegisterForm = () => {
                                         ))}
                                     </select>
                                 </div>
-                            </div>
+                            </div >
                             <div className="flex flex-col md:flex-row mb-4">
 
                                 <div className="w-full mr-4">
@@ -677,7 +693,7 @@ const RegisterForm = () => {
                                         value={addresData.unit}
                                         onChange={handleAddressChange}
                                     />
-                                </div>
+                                </div >
                                 <div className="w-full mr-4">
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="building">Building</label>
                                     <input
@@ -688,7 +704,7 @@ const RegisterForm = () => {
                                         value={addresData.building}
                                         onChange={handleAddressChange}
                                     />
-                                </div>
+                                </div >
                                 <div className="w-full mr-4">
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="street">Street</label>
                                     <input
@@ -699,9 +715,9 @@ const RegisterForm = () => {
                                         value={addresData.street}
                                         onChange={handleAddressChange}
                                     />
-                                </div>
+                                </div >
 
-                            </div>
+                            </div >
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="w-full mr-4">
                                     {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="region">Region</label> */}
@@ -739,7 +755,7 @@ const RegisterForm = () => {
                                         items={provinces}
                                         selectKey="PROVINCE"
                                         onChange={setProvince} value={province} />
-                                </div>
+                                </div >
                                 <div className="w-full mr-4">
                                     {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="municipality">Municipality</label>
                                     <input
@@ -755,7 +771,7 @@ const RegisterForm = () => {
                                         items={filteredMunicipals}
                                         selectKey="MUNICIPAL"
                                         onChange={setMunicipal} value={municipal} />
-                                </div>
+                                </div >
                                 <div className="w-full mr-4">
                                     {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="barangay">Barangay</label>
                                     <input
@@ -771,10 +787,10 @@ const RegisterForm = () => {
                                         items={filteredBarangays}
                                         selectKey="BARANGAY"
                                         onChange={setBarangay} value={barangay} />
-                                </div>
+                                </div >
 
 
-                            </div>
+                            </div >
                             <div>
                                 <div className="w-44 mr-4">
                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="zipCode">ZIP Code</label>
@@ -791,9 +807,12 @@ const RegisterForm = () => {
                                         type="checkbox"
                                         value="Scholar"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        checked={selectedOptions.includes('Scholar')}
-                                        onChange={handleOptionChange} />
-                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Scholar</label>
+                                        checked={selectedOptions.includes("Scholar")}
+                                        onChange={handleOptionChange}
+                                    />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        Scholar
+                                    </label>
                                 </div>
                                 <div className="flex items-center">
                                     <input
@@ -801,9 +820,12 @@ const RegisterForm = () => {
                                         type="checkbox"
                                         value="4ps"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        checked={selectedOptions.includes('4ps')}
-                                        onChange={handleOptionChange} />
-                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">4p's</label>
+                                        checked={selectedOptions.includes("4ps")}
+                                        onChange={handleOptionChange}
+                                    />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        4p's
+                                    </label>
                                 </div>
                                 <div className="flex items-center">
                                     <input
@@ -811,9 +833,12 @@ const RegisterForm = () => {
                                         type="checkbox"
                                         value="Senior"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        checked={selectedOptions.includes('Senior')}
-                                        onChange={handleOptionChange} />
-                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Senior</label>
+                                        checked={selectedOptions.includes("Senior")}
+                                        onChange={handleOptionChange}
+                                    />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        Senior
+                                    </label>
                                 </div>
                                 <div className="flex items-center">
                                     <input
@@ -821,9 +846,12 @@ const RegisterForm = () => {
                                         type="checkbox"
                                         value="Sap"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        checked={selectedOptions.includes('Sap')}
-                                        onChange={handleOptionChange} />
-                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">SAP</label>
+                                        checked={selectedOptions.includes("Sap")}
+                                        onChange={handleOptionChange}
+                                    />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        SAP
+                                    </label>
                                 </div>
                                 <div className="flex items-center">
                                     <input
@@ -831,9 +859,12 @@ const RegisterForm = () => {
                                         type="checkbox"
                                         value="Single"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        checked={selectedOptions.includes('Single')}
-                                        onChange={handleOptionChange} />
-                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Single Parent</label>
+                                        checked={selectedOptions.includes("Single")}
+                                        onChange={handleOptionChange}
+                                    />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        Single Parent
+                                    </label>
                                 </div>
                                 <div className="flex items-center">
                                     <input
@@ -841,14 +872,16 @@ const RegisterForm = () => {
                                         type="checkbox"
                                         value="Pwd"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        checked={selectedOptions.includes('Pwd')}
-                                        onChange={handleOptionChange} />
-                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Person with Disability</label>
+                                        checked={selectedOptions.includes("Pwd")}
+                                        onChange={handleOptionChange}
+                                    />
+                                    <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        Person with Disability
+                                    </label>
                                 </div>
                             </div>
-                        </div>
-
-                    </Stepper.Step>
+                        </div >
+                    </Stepper.Step >
                     <Stepper.Step label="Second step" description="ID Picture">
                         <div className="flex justify-center m-4 flex-col">
                             <button
@@ -927,7 +960,6 @@ const RegisterForm = () => {
                                 <p className="text-red-500 mt-2">Pins do not match</p>
                             )}
                         </div>
-
                     </Stepper.Step>
                     <Stepper.Step label="Fourth Step" description="Confirmation">
                         <div className="flex justify-center m-4 flex-col">
@@ -947,7 +979,7 @@ const RegisterForm = () => {
 
                                                     <p className="text-lg font-medium underline">{formData.subject.PCN}</p>
 
-                                                </div>
+                                                </div >
                                                 <div className="md:w-1/3 mr-4">
                                                     <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DateIssued">
                                                         Date Issued
@@ -955,22 +987,22 @@ const RegisterForm = () => {
 
                                                     <p className="text-lg font-medium underline">{formData.DateIssued}</p>
                                                 </div>
-                                            </div>
+                                            </div >
 
-                                        </div>
+                                        </div >
                                         <div className="flex justify-end">
                                             <div className="flex-col">
                                                 {screenshot && <img src={screenshot ?? ""} className="w-72"></img>}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div >
                                     <div className="flex flex-col md:flex-row mb-4">
                                         <div className="md:w-1/3 mr-4">
                                             <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="lName">
                                                 Last Name
                                             </label>
                                             <p className="text-lg font-medium underline">{formData.subject.lName} ,</p>
-                                        </div>
+                                        </div >
                                         <div className="md:w-1/3 mr-4">
                                             <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="fName">
                                                 First Name
@@ -989,14 +1021,14 @@ const RegisterForm = () => {
                                             </label>
                                             <p className="text-lg font-medium underline">{formData.subject.suffix}</p>
                                         </div>
-                                    </div>
+                                    </div >
                                     <div className="flex flex-col md:flex-row mb-4">
                                         <div className="md:w-1/3 mr-4">
                                             <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DOB">
                                                 Date of Birth
                                             </label>
                                             <p className="text-lg font-medium underline">{formData.subject.DOB}</p>
-                                        </div>
+                                        </div >
 
                                         <div className="md:w-1/6 mr-4">
                                             <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="sex">
@@ -1004,9 +1036,7 @@ const RegisterForm = () => {
                                             </label>
                                             <p className="text-lg font-medium underline">{formData.subject.sex}</p>
                                         </div>
-
-
-                                    </div>
+                                    </div >
 
                                     <div className="flex flex-col md:flex-row mb-4">
                                         <div className="w-full mr-4">
@@ -1014,10 +1044,10 @@ const RegisterForm = () => {
                                                 Place of Birth
                                             </label>
                                             <p className="text-lg font-medium underline">{formData.subject.POB}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                        </div >
+                                    </div >
+                                </div >
+                            </div >
                             <div>
                                 <div className="py-4">
                                     <p className="text-xl font-bold">Other Information</p>
@@ -1029,7 +1059,7 @@ const RegisterForm = () => {
                                             Phone Number
                                         </label>
                                         <p className="text-lg font-medium underline">{formData.subject.phone}</p>
-                                    </div>
+                                    </div >
                                     <div className="md:w-1/3 mr-4">
                                         <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="email">
                                             Email Address
@@ -1037,7 +1067,7 @@ const RegisterForm = () => {
                                         <p className="text-lg font-medium underline">{formData.subject.email}</p>
                                     </div>
 
-                                </div>
+                                </div >
                                 <div className="flex flex-col md:flex-row mb-4">
                                     <div className="md:w-1/3 mr-4">
                                         <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="occupation">
@@ -1060,9 +1090,11 @@ const RegisterForm = () => {
                                         </label>
                                         <p className="text-lg font-medium underline">{`${addresData.unit} ${addresData.building} ${addresData.street} ${barangay} ${municipal} ${province} ${addresData.region} ${addresData.zipCode}`}</p>
                                     </div>
-                                </div>
+                                </div >
                                 <div>
-                                    <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Beneficiaries</p>
+                                    <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Beneficiaries
+                                    </p>
                                 </div>
                                 <div className="flex flex-row space-x-4 py-2">
                                     <div className="flex items-center">
@@ -1072,9 +1104,12 @@ const RegisterForm = () => {
                                             value="Scholar"
                                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                             disabled
-                                            checked={selectedOptions.includes('Scholar')}
-                                            onChange={handleOptionChange} />
-                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Scholar</label>
+                                            checked={selectedOptions.includes("Scholar")}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            Scholar
+                                        </label>
                                     </div>
                                     <div className="flex items-center">
                                         <input
@@ -1083,9 +1118,12 @@ const RegisterForm = () => {
                                             value="4ps"
                                             disabled
                                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                            checked={selectedOptions.includes('4ps')}
-                                            onChange={handleOptionChange} />
-                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">4p's</label>
+                                            checked={selectedOptions.includes("4ps")}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            4p's
+                                        </label>
                                     </div>
                                     <div className="flex items-center">
                                         <input
@@ -1094,9 +1132,12 @@ const RegisterForm = () => {
                                             value="Senior"
                                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                             disabled
-                                            checked={selectedOptions.includes('Senior')}
-                                            onChange={handleOptionChange} />
-                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Senior</label>
+                                            checked={selectedOptions.includes("Senior")}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            Senior
+                                        </label>
                                     </div>
                                     <div className="flex items-center">
                                         <input
@@ -1105,9 +1146,12 @@ const RegisterForm = () => {
                                             value="Sap"
                                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                             disabled
-                                            checked={selectedOptions.includes('Sap')}
-                                            onChange={handleOptionChange} />
-                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">SAP</label>
+                                            checked={selectedOptions.includes("Sap")}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            SAP
+                                        </label>
                                     </div>
                                     <div className="flex items-center">
                                         <input
@@ -1116,9 +1160,12 @@ const RegisterForm = () => {
                                             value="Single"
                                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                             disabled
-                                            checked={selectedOptions.includes('Single')}
-                                            onChange={handleOptionChange} />
-                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Single Parent</label>
+                                            checked={selectedOptions.includes("Single")}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            Single Parent
+                                        </label>
                                     </div>
                                     <div className="flex items-center">
                                         <input
@@ -1127,12 +1174,15 @@ const RegisterForm = () => {
                                             value="Pwd"
                                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                             disabled
-                                            checked={selectedOptions.includes('Pwd')}
-                                            onChange={handleOptionChange} />
-                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Person with Disability</label>
+                                            checked={selectedOptions.includes("Pwd")}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            Person with Disability
+                                        </label>
                                     </div>
                                 </div>
-                            </div>
+                            </div >
                             <div className="flex flex-col content-center items-center my-4">
 
                                 <div className="flex-col">
@@ -1144,10 +1194,8 @@ const RegisterForm = () => {
                                 </div>
 
                             </div>
-
-
                         </div>
-                    </Stepper.Step>
+                    </Stepper.Step >
                     <Stepper.Step label="Fifth Step" description="Generate PDF">
                         <div className="h-[700px]">
                             {pdfUrl && <DisplayPDF pdfUrl={pdfUrl} />}
@@ -1156,7 +1204,11 @@ const RegisterForm = () => {
                 </Stepper>
 
                 <Modal isVisible={camVisible} setIsVisible={setCamVisible} title="Id Picture" className="max-w-xl">
-                    <WebcamComponent screenshot={screenshot} setScreenshot={setScreenshot} setIsVisible={setCamVisible} />
+                    <WebcamComponent
+                        screenshot={screenshot}
+                        setScreenshot={setScreenshot}
+                        setIsVisible={setCamVisible}
+                    />
                 </Modal>
 
                 <Group position="center" mt="xl">
@@ -1186,8 +1238,8 @@ const RegisterForm = () => {
                         </div>
                     )}
                 </Group>
-            </form>
-        </div>
+            </form >
+        </div >
     )
 }
 
@@ -1196,5 +1248,3 @@ export default RegisterForm
 function DisplayPDF({ pdfUrl }: any) {
     return <object data={pdfUrl} type="application/pdf" width="100%" height="100%" />
 }
-
-
