@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import Modal from "./components/Modal"
 import QrComponent from "./components/QR Reader"
 import { philsysForm } from "./lib/generics"
@@ -11,8 +11,16 @@ import sendData from "./lib/api"
 import { Signature } from "./components/Signature"
 import { DatePicker } from "@mantine/dates"
 import { jobCategoryOptions, maritalStatusOptions } from "./lib/dropdownvalues"
+import MCashCredentials from "./components/mcashCredential"
+import Select from "./components/Inputs/Select"
+
+import provinces from "./assets/jsons/provincess.json"
+import municipals from "./assets/jsons/municipals.json"
+import barangays from "./assets/jsons/barangays.json"
 
 const pb = new PocketBase("http://127.0.0.1:8090/")
+
+
 
 const RegisterForm = () => {
     const [qrVisible, setQrVisible] = useState<boolean>(false)
@@ -43,10 +51,12 @@ const RegisterForm = () => {
 
     const [pdfUrl, setPdfUrl] = useState(null)
 
+    const [creds, setCreds] = useState(false);
+
     const [addresData, setAddressData] = useState({
         unit: '',
-        houseNo: '',
         building: '',
+        street: '',
         region: '',
         province: '',
         municipality: '',
@@ -68,15 +78,56 @@ const RegisterForm = () => {
             POB: "",
             PCN: "",
             phone: "",
-            marital: "single",
+            marital: "",
             occupation: "",
             address: "",
+            email: "",
             benefits: [],
         },
         alg: "",
         pin: "",
         signature: "",
     })
+
+    const [region, setRegion] = useState("")
+    const [province, setProvince] = useState("")
+    const [municipal, setMunicipal] = useState("")
+    const [barangay, setBarangay] = useState("")
+    const [zip, setZip] = useState("")
+
+    useEffect(() => {
+        const result = filteredMunicipals.find((item) => item.MUNICIPAL === municipal);
+
+        setZip(result?.ZIP ?? "");
+        setAddressData({
+            ...addresData,
+            zipCode: zip
+        })
+    }, [municipal])
+
+    useEffect(() => {
+        setAddressData({
+            ...addresData,
+            municipality: municipal,
+        })
+    }, [municipal])
+
+    useEffect(() => {
+        setAddressData({
+            ...addresData,
+            province: province
+        })
+    }, [province])
+
+    useEffect(() => {
+        const result = filteredMunicipals.find((item) => item.MUNICIPAL === municipal);
+
+        setZip(result?.ZIP ?? "");
+        setAddressData({
+            ...addresData,
+            barangay: barangay
+        })
+    }, [barangay])
 
     const handleChange = (e: any) => {
         setFormData({
@@ -139,7 +190,14 @@ const RegisterForm = () => {
             },
         })
 
-        console.log(formData);
+    }
+    const handleAddressChange = (e: any) => {
+        setAddressData({
+            ...addresData,
+            [e.target.name]: e.target.value,
+
+        })
+
     }
     const handleOptionChange = (event: any) => {
         if (selectedOptions.includes(event.target.value)) {
@@ -154,6 +212,7 @@ const RegisterForm = () => {
 
         let flag = true
         let count = 0
+        const newImage = base64ConvertToFile(screenshot ?? "")
 
         while (flag && count < 10) {
             if (
@@ -171,12 +230,12 @@ const RegisterForm = () => {
                 m_name: formData.subject.mName,
                 gender: formData.subject.sex,
                 occupation: formData.subject.occupation,
-                phone: formData.subject.phone,
+                phone: `+63${formData.subject.phone}`,
                 email: `${formData.subject.lName}.${formData.subject.fName}@lgudavao.com`,
                 password: pin.join(""),
             }
 
-            let rsp: any = await sendData(screenshot, insertData)
+            let rsp: any = await sendData(newImage, insertData)
             console.log(rsp)
 
             if (rsp === "success") {
@@ -204,7 +263,7 @@ const RegisterForm = () => {
                     date_issued: parseDate(formData.DateIssued),
                     sex: formData.subject.sex,
                     occupation: formData.subject.occupation,
-                    phone: insertData.phone,
+                    phone: `${formData.subject.phone}`,
                     marital: formData.subject.marital,
                     address: addresData,
                     // image: screenshot,
@@ -269,9 +328,10 @@ const RegisterForm = () => {
                 //         setPdfUrl(URL.createObjectURL(response.data))
                 //     })
                 handleGeneratePdf()
+
+                setCreds(true);
             }
             // 
-            nextStep();
         }
     }
 
@@ -296,7 +356,7 @@ const RegisterForm = () => {
         formDataX2.append("date_issue", formData.DateIssued)
         formDataX2.append("marital_status", formData.subject.marital)
         formDataX2.append("gender", formData.subject.sex)
-        formDataX2.append("phone", formData.subject.phone)
+        formDataX2.append("phone", `${formData.subject.phone}`)
         formDataX2.append("pcn", formData.subject.PCN)
         formDataX2.append("philsys_data", JSON.stringify(formData))
 
@@ -340,9 +400,46 @@ const RegisterForm = () => {
     //     }
     // }, [pin, confirmPin])
 
+    const filteredMunicipals = useMemo(() => {
+        let newMunicipals = []
+        for (let index = 0; index < municipals.length; index++) {
+            const element = municipals[index];
+            if (province === element.PROVINCE) {
+                newMunicipals.push(element)
+            }
+        }
+        setMunicipal("")
+        return newMunicipals
+    }, [province])
+
+    const filteredBarangays = useMemo(() => {
+        let newBarangays: Array<any> = []
+        if (municipal === "") {
+            return newBarangays
+        }
+        for (let index = 0; index < barangays.length; index++) {
+            const element = barangays[index];
+            if (province === element.PROVINCE && municipal === element.MUNICIPAL) {
+                newBarangays.push(element)
+            }
+        }
+        setBarangay("")
+        return newBarangays
+    }, [province, municipal])
+
     return (
         <div className="">
             <form onSubmit={handleSubmit}>
+                <Modal
+                    title={"E-Wallet Credential"}
+                    isVisible={creds}
+                    setIsVisible={setCreds}
+                    className={"max-w-sm"}
+                >
+                    <div>
+                        <MCashCredentials accountNumber={`63${formData.subject.phone}`} nextStep={nextStep} setCreds={setCreds} />
+                    </div>
+                </Modal>
                 <Stepper active={active} breakpoint="sm">
                     <Stepper.Step label="First step" description="Create an account">
                         <Modal
@@ -353,6 +450,7 @@ const RegisterForm = () => {
                         >
                             <div>{qrVisible && <QrComponent formData={formData} setFormData={setFormData} setIsVisible={setQrVisible} />}</div>
                         </Modal>
+
                         <div className="flex justify-end space-x-2">
                             <button
                                 type="button"
@@ -369,7 +467,7 @@ const RegisterForm = () => {
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="PCN">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="PCN">
                                         PCN
                                     </label>
                                     <input
@@ -382,7 +480,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="DateIssued">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DateIssued">
                                         Date Issued
                                     </label>
                                     <DatePicker withAsterisk onChange={(e) => {
@@ -396,7 +494,7 @@ const RegisterForm = () => {
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="lName">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="lName">
                                         Last Name
                                     </label>
                                     <input
@@ -409,7 +507,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="fName">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="fName">
                                         First Name
                                     </label>
                                     <input
@@ -422,7 +520,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="mName">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="mName">
                                         Middle Name
                                     </label>
                                     <input
@@ -435,7 +533,7 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="w-1/12 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="Suffix">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="Suffix">
                                         Suffix
                                     </label>
                                     <input
@@ -450,7 +548,7 @@ const RegisterForm = () => {
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="DOB">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DOB">
                                         Date of Birth
                                     </label>
                                     <DatePicker placeholder="Pick date" withAsterisk onChange={(val) => {
@@ -466,7 +564,7 @@ const RegisterForm = () => {
                                 </div>
 
                                 <div className="md:w-1/6 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="sex">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="sex">
                                         Sex
                                     </label>
                                     <input
@@ -484,7 +582,7 @@ const RegisterForm = () => {
 
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="POB">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="POB">
                                         Place of Birth
                                     </label>
                                     <input
@@ -504,7 +602,7 @@ const RegisterForm = () => {
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="phone">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="phone">
                                         Phone Number
                                     </label>
                                     <input
@@ -516,7 +614,21 @@ const RegisterForm = () => {
                                     />
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="occupation">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="email">
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="email"
+                                        id="email" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={formData.subject.email}
+                                        onChange={handleSubjectChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="md:w-1/3 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="occupation">
                                         Occupation
                                     </label>
                                     <select
@@ -535,7 +647,7 @@ const RegisterForm = () => {
 
                                 </div>
                                 <div className="md:w-1/3 mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="marital">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="marital">
                                         Marital Status
                                     </label>
                                     <select
@@ -554,111 +666,122 @@ const RegisterForm = () => {
                                 </div>
                             </div>
                             <div className="flex flex-col md:flex-row mb-4">
-                                {/* <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="address">
-                                        Permanent Address
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        id="address"
-                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.subject.address}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                            </div>
-                            <div> */}
+
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="unit">Unit</label>
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="unit">Unit / House No.</label>
                                     <input
                                         type="text"
                                         name="unit"
                                         id="unit"
                                         className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.unit}
-                                        onChange={handleSubjectChange}
+                                        value={addresData.unit}
+                                        onChange={handleAddressChange}
                                     />
                                 </div>
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="houseNo">House No.</label>
-                                    <input
-                                        type="text"
-                                        name="houseNo"
-                                        id="houseNo"
-                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.houseNo}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
-                                <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="building">Building</label>
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="building">Building</label>
                                     <input
                                         type="text"
                                         name="building"
                                         id="building"
                                         className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.building}
-                                        onChange={handleSubjectChange}
+                                        value={addresData.building}
+                                        onChange={handleAddressChange}
                                     />
                                 </div>
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="region">Region</label>
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="street">Street</label>
                                     <input
+                                        type="text"
+                                        name="street"
+                                        id="street"
+                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={addresData.street}
+                                        onChange={handleAddressChange}
+                                    />
+                                </div>
+
+                            </div>
+                            <div className="flex flex-col md:flex-row mb-4">
+                                <div className="w-full mr-4">
+                                    {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="region">Region</label> */}
+                                    {/* <input
                                         type="text"
                                         name="region"
                                         id="region"
                                         className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.region}
-                                        onChange={handleSubjectChange}
-                                    />
+                                        value={addresData.region}
+                                        onChange={handleAddressChange}
+                                    /> */}
+                                    <Select name="region" id="region" placeholder="Region"
+                                        label="Region"
+                                        items={[{
+                                            "ID": "1",
+                                            "REGION": "REGION XI (Davao Region)",
+                                            "PROVINCE": "COMPOSTELA VALLEY",
+                                            "POP": "462939"
+                                        }]}
+                                        selectKey="REGION"
+                                        onChange={setRegion} value={region} />
                                 </div>
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="province">Province</label>
+                                    {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="province">Province</label>
                                     <input
                                         type="text"
                                         name="province"
                                         id="province"
                                         className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.province}
-                                        onChange={handleSubjectChange}
-                                    />
+                                        value={addresData.province}
+                                        onChange={handleAddressChange}
+                                    /> */}
+                                    <Select name="province" id="province" placeholder="Province"
+                                        label="Province"
+                                        items={provinces}
+                                        selectKey="PROVINCE"
+                                        onChange={setProvince} value={province} />
                                 </div>
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="municipality">Municipality</label>
+                                    {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="municipality">Municipality</label>
                                     <input
                                         type="text"
                                         name="municipality"
                                         id="municipality"
                                         className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.municipality}
-                                        onChange={handleSubjectChange}
-                                    />
+                                        value={addresData.municipality}
+                                        onChange={handleAddressChange}
+                                    /> */}
+                                    <Select name="municipality" id="municipality" placeholder="Municipality"
+                                        label="Municipality"
+                                        items={filteredMunicipals}
+                                        selectKey="MUNICIPAL"
+                                        onChange={setMunicipal} value={municipal} />
                                 </div>
                                 <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="barangay">Barangay</label>
+                                    {/* <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="barangay">Barangay</label>
                                     <input
                                         type="text"
                                         name="barangay"
                                         id="barangay"
                                         className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.barangay}
-                                        onChange={handleSubjectChange}
-                                    />
+                                        value={addresData.barangay}
+                                        onChange={handleAddressChange}
+                                    /> */}
+                                    <Select name="barangay" id="barangay" placeholder="Barangay"
+                                        label="Barangay"
+                                        items={filteredBarangays}
+                                        selectKey="BARANGAY"
+                                        onChange={setBarangay} value={barangay} />
                                 </div>
-                                <div className="w-full mr-4">
-                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="zipCode">ZIP Code</label>
-                                    <input
-                                        type="text"
-                                        name="zipCode"
-                                        id="zipCode"
-                                        className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={formData.zipCode}
-                                        onChange={handleSubjectChange}
-                                    />
-                                </div>
+
+
                             </div>
                             <div>
+                                <div className="w-44 mr-4">
+                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="zipCode">ZIP Code</label>
+                                    <p>{zip}</p>
+                                </div>
+                            </div>
+                            <div className="my-4">
                                 <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Benefits</p>
                             </div>
                             <div className="flex flex-row space-x-4 py-2">
@@ -818,126 +941,68 @@ const RegisterForm = () => {
                                             </div>
                                             <div className="flex flex-col md:flex-row mb-4 content-end items-end">
                                                 <div className="md:w-1/3 mr-4">
-                                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="PCN">
+                                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="PCN">
                                                         PCN
                                                     </label>
-                                                    <input
-                                                        type="text"
-                                                        name="PCN"
-                                                        id="PCN" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                        disabled
-                                                        value={formData.subject.PCN}
-                                                        onChange={handleSubjectChange}
-                                                    />
+
+                                                    <p className="text-lg font-medium underline">{formData.subject.PCN}</p>
+
                                                 </div>
                                                 <div className="md:w-1/3 mr-4">
-                                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="DateIssued">
+                                                    <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DateIssued">
                                                         Date Issued
                                                     </label>
 
-                                                    <DatePicker withAsterisk onChange={(e) => {
-                                                        setFormData({
-                                                            ...formData,
-                                                            DateIssued: e,
-
-                                                        })
-                                                    }} value={new Date(formData.DateIssued)} size="md"
-                                                        disabled />
+                                                    <p className="text-lg font-medium underline">{formData.DateIssued}</p>
                                                 </div>
                                             </div>
-
 
                                         </div>
                                         <div className="flex justify-end">
                                             <div className="flex-col">
-                                                {screenshot && <img src={screenshot ?? ""} className="w-48"></img>}
+                                                {screenshot && <img src={screenshot ?? ""} className="w-72"></img>}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex flex-col md:flex-row mb-4">
                                         <div className="md:w-1/3 mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="lName">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="lName">
                                                 Last Name
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="lName"
-                                                id="lName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                disabled
-                                                value={formData.subject.lName}
-                                                onChange={handleSubjectChange}
-                                            />
+                                            <p className="text-lg font-medium underline">{formData.subject.lName} ,</p>
                                         </div>
                                         <div className="md:w-1/3 mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="fName">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="fName">
                                                 First Name
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="fName"
-                                                id="fName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                disabled
-                                                value={formData.subject.fName}
-                                                onChange={handleSubjectChange}
-                                            />
+                                            <p className="text-lg font-medium underline">{formData.subject.fName}</p>
                                         </div>
                                         <div className="md:w-1/3 mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="mName">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="mName">
                                                 Middle Name
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="mName"
-                                                id="mName" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                disabled
-                                                value={formData.subject.mName}
-                                                onChange={handleSubjectChange}
-                                            />
+                                            <p className="text-lg font-medium underline">{formData.subject.mName}</p>
                                         </div>
                                         <div className="w-1/12 mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="Suffix">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="Suffix">
                                                 Suffix
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="Suffix"
-                                                id="Suffix" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                disabled
-                                                value={formData.subject.Suffix}
-                                                onChange={handleSubjectChange}
-                                            />
+                                            <p className="text-lg font-medium underline">{formData.subject.suffix}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col md:flex-row mb-4">
                                         <div className="md:w-1/3 mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="DOB">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="DOB">
                                                 Date of Birth
                                             </label>
-                                            <DatePicker placeholder="Pick date" withAsterisk onChange={(val) => {
-                                                setFormData({
-                                                    ...formData,
-                                                    subject: {
-                                                        ...formData.subject,
-                                                        DOB: val,
-                                                    }
-
-                                                })
-                                            }} value={new Date(formData.subject.DOB)} size="md"
-                                                disabled />
+                                            <p className="text-lg font-medium underline">{formData.subject.DOB}</p>
                                         </div>
 
                                         <div className="md:w-1/6 mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="sex">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="sex">
                                                 Sex
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="sex"
-                                                id="sex" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                disabled
-                                                value={formData.subject.sex}
-                                                onChange={handleSubjectChange}
-                                            />
+                                            <p className="text-lg font-medium underline">{formData.subject.sex}</p>
                                         </div>
 
 
@@ -945,17 +1010,10 @@ const RegisterForm = () => {
 
                                     <div className="flex flex-col md:flex-row mb-4">
                                         <div className="w-full mr-4">
-                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="POB">
+                                            <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="POB">
                                                 Place of Birth
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="POB"
-                                                id="POB" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                disabled
-                                                value={formData.subject.POB}
-                                                onChange={handleSubjectChange}
-                                            />
+                                            <p className="text-lg font-medium underline">{formData.subject.POB}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -967,72 +1025,40 @@ const RegisterForm = () => {
                                 </div>
                                 <div className="flex flex-col md:flex-row mb-4">
                                     <div className="md:w-1/3 mr-4">
-                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="phone">
+                                        <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="phone">
                                             Phone Number
                                         </label>
-                                        <input
-                                            type="text"
-                                            name="phone"
-                                            id="phone" className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                            disabled
-                                            value={formData.subject.phone}
-                                            onChange={handleSubjectChange}
-                                        />
+                                        <p className="text-lg font-medium underline">{formData.subject.phone}</p>
                                     </div>
                                     <div className="md:w-1/3 mr-4">
-                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="occupation">
+                                        <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="email">
+                                            Email Address
+                                        </label>
+                                        <p className="text-lg font-medium underline">{formData.subject.email}</p>
+                                    </div>
+
+                                </div>
+                                <div className="flex flex-col md:flex-row mb-4">
+                                    <div className="md:w-1/3 mr-4">
+                                        <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="occupation">
                                             Occupation
                                         </label>
-                                        <select
-                                            name="occupation"
-                                            id="occupation"
-                                            value={formData.occupation}
-                                            disabled
-                                            onChange={handleSubjectChange}
-                                            className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        >
-                                            {jobCategoryOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <p className="text-lg font-medium underline">{formData.subject.occupation}</p>
 
                                     </div>
                                     <div className="md:w-1/3 mr-4">
-                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="marital">
+                                        <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="marital">
                                             Marital Status
                                         </label>
-                                        <select
-                                            name="marital"
-                                            id="marital"
-                                            value={formData.marital}
-                                            disabled
-                                            onChange={handleSubjectChange}
-                                            className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        >
-                                            {maritalStatusOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <p className="text-lg font-medium underline">{formData.subject.marital}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col md:flex-row mb-4">
                                     <div className="w-full mr-4">
-                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="address">
+                                        <label className="block mb-2 text-sm font-medium text-gray-500 dark:text-white" htmlFor="address">
                                             Permanent Address
                                         </label>
-                                        <input
-                                            type="text"
-                                            name="address"
-                                            id="address"
-                                            className="form-input w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                            disabled
-                                            value={formData.subject.address}
-                                            onChange={handleSubjectChange}
-                                        />
+                                        <p className="text-lg font-medium underline">{`${addresData.unit} ${addresData.building} ${addresData.street} ${barangay} ${municipal} ${province} ${addresData.region} ${addresData.zipCode}`}</p>
                                     </div>
                                 </div>
                                 <div>
@@ -1107,19 +1133,22 @@ const RegisterForm = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-row justify-between">
-
+                            <div className="flex flex-col content-center items-center my-4">
 
                                 <div className="flex-col">
-                                    <p>Signature</p>
                                     {signature && <img src={signature ?? ""} className="bg-white"></img>}
+
                                 </div>
+                                <div className="my-4">
+                                    <p className="font-bold">Signature</p>
+                                </div>
+
                             </div>
 
 
                         </div>
                     </Stepper.Step>
-                    <Stepper.Step>
+                    <Stepper.Step label="Fifth Step" description="Generate PDF">
                         <div className="h-[700px]">
                             {pdfUrl && <DisplayPDF pdfUrl={pdfUrl} />}
                         </div>

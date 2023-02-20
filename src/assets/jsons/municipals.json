@@ -1,0 +1,394 @@
+﻿[
+  {
+    "ID": "1",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "COMPOSTELA",
+    "ZIP": "8803",
+    "POP": "53887"
+  },
+  {
+    "ID": "2",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "LAAK (SAN VICENTE)",
+    "ZIP": "8810",
+    "POP": "49115"
+  },
+  {
+    "ID": "3",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "MABINI (DOÑA ALICIA)",
+    "ZIP": "8807",
+    "POP": "26366"
+  },
+  {
+    "ID": "4",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "MACO",
+    "ZIP": "8806",
+    "POP": "51700"
+  },
+  {
+    "ID": "5",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "MARAGUSAN (SAN MARIANO)",
+    "ZIP": "8808",
+    "POP": "38939"
+  },
+  {
+    "ID": "6",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "MAWAB",
+    "ZIP": "8802",
+    "POP": "25587"
+  },
+  {
+    "ID": "7",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "MONKAYO",
+    "ZIP": "8805",
+    "POP": "57718"
+  },
+  {
+    "ID": "8",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "MONTEVISTA",
+    "ZIP": "8801",
+    "POP": "28209"
+  },
+  {
+    "ID": "9",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "NABUNTURAN",
+    "ZIP": "8800",
+    "POP": "46184"
+  },
+  {
+    "ID": "10",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "NEW BATAAN",
+    "ZIP": "8804",
+    "POP": "32184"
+  },
+  {
+    "ID": "11",
+    "REGION": "REGION XI",
+    "PROVINCE": "COMPOSTELA VALLEY",
+    "MUNICIPAL": "PANTUKAN",
+    "ZIP": "8809",
+    "POP": "53050"
+  },
+  {
+    "ID": "12",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "ASUNCION (SAUG)",
+    "ZIP": "8102",
+    "POP": "36367"
+  },
+  {
+    "ID": "13",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "BRAULIO E. DUJALI",
+    "ZIP": "8106",
+    "POP": "17086"
+  },
+  {
+    "ID": "14",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "CARMEN",
+    "ZIP": "8101",
+    "POP": "44727"
+  },
+  {
+    "ID": "15",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "CITY OF TAGUM",
+    "ZIP": "8015",
+    "POP": "154218"
+  },
+  {
+    "ID": "16",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "ISLAND GARDEN CITY OF SAMAL",
+    "ZIP": "8119",
+    "POP": "70630"
+  },
+  {
+    "ID": "17",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "KAPALONG",
+    "ZIP": "8113",
+    "POP": "46921"
+  },
+  {
+    "ID": "18",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "NEW CORELLA",
+    "ZIP": "8104",
+    "POP": "33235"
+  },
+  {
+    "ID": "19",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "PANABO CITY",
+    "ZIP": "8105",
+    "POP": "107587"
+  },
+  {
+    "ID": "20",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "SAN ISIDRO",
+    "ZIP": "8101",
+    "POP": "17993"
+  },
+  {
+    "ID": "21",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "SANTO TOMAS",
+    "ZIP": "8112",
+    "POP": "64276"
+  },
+  {
+    "ID": "22",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO (DAVAO DEL NORTE)",
+    "MUNICIPAL": "TALAINGOD",
+    "ZIP": "8100",
+    "POP": "12602"
+  },
+  {
+    "ID": "23",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "BANSALAN",
+    "ZIP": "8005",
+    "POP": "42855"
+  },
+  {
+    "ID": "24",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "DAVAO CITY",
+    "ZIP": "8000",
+    "POP": "984604"
+  },
+  {
+    "ID": "25",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "DIGOS CITY",
+    "ZIP": "8002",
+    "POP": "111015"
+  },
+  {
+    "ID": "26",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "HAGONOY",
+    "ZIP": "8006",
+    "POP": "35371"
+  },
+  {
+    "ID": "27",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "KIBLAWAN",
+    "ZIP": "8008",
+    "POP": "28109"
+  },
+  {
+    "ID": "28",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "MAGSAYSAY",
+    "ZIP": "8004",
+    "POP": "36794"
+  },
+  {
+    "ID": "29",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "MALALAG",
+    "ZIP": "8010",
+    "POP": "24887"
+  },
+  {
+    "ID": "30",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "MATANAO",
+    "ZIP": "8003",
+    "POP": "37817"
+  },
+  {
+    "ID": "31",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "PADADA",
+    "ZIP": "8007",
+    "POP": "22228"
+  },
+  {
+    "ID": "32",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "SANTA CRUZ",
+    "ZIP": "8001",
+    "POP": "63329"
+  },
+  {
+    "ID": "33",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO DEL SUR",
+    "MUNICIPAL": "SULOP",
+    "ZIP": "8009",
+    "POP": "23181"
+  },
+  {
+    "ID": "34",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO OCCIDENTAL",
+    "MUNICIPAL": "DON MARCELINO",
+    "ZIP": "8013",
+    "POP": "24584"
+  },
+  {
+    "ID": "35",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO OCCIDENTAL",
+    "MUNICIPAL": "JOSE ABAD SANTOS (TRINIDAD)",
+    "ZIP": "8014",
+    "POP": "41351"
+  },
+  {
+    "ID": "36",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO OCCIDENTAL",
+    "MUNICIPAL": "MALITA",
+    "ZIP": "8012",
+    "POP": "67286"
+  },
+  {
+    "ID": "37",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO OCCIDENTAL",
+    "MUNICIPAL": "SANTA MARIA",
+    "ZIP": "8011",
+    "POP": "33771"
+  },
+  {
+    "ID": "38",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO OCCIDENTAL",
+    "MUNICIPAL": "SARANGANI",
+    "ZIP": "8015",
+    "POP": "15130"
+  },
+  {
+    "ID": "39",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "BAGANGA",
+    "ZIP": "8204",
+    "POP": "35024"
+  },
+  {
+    "ID": "40",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "BANAYBANAY",
+    "ZIP": "8208",
+    "POP": "28673"
+  },
+  {
+    "ID": "41",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "BOSTON",
+    "ZIP": "8206",
+    "POP": "10371"
+  },
+  {
+    "ID": "42",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "CARAGA",
+    "ZIP": "8203",
+    "POP": "26114"
+  },
+  {
+    "ID": "43",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "CATEEL",
+    "ZIP": "8205",
+    "POP": "27964"
+  },
+  {
+    "ID": "44",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "GOVERNOR GENEROSO",
+    "ZIP": "8210",
+    "POP": "36010"
+  },
+  {
+    "ID": "45",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "LUPON",
+    "ZIP": "8207",
+    "POP": "47589"
+  },
+  {
+    "ID": "46",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "MANAY",
+    "ZIP": "8202",
+    "POP": "26820"
+  },
+  {
+    "ID": "47",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "MATI CITY",
+    "ZIP": "8200",
+    "POP": "85289"
+  },
+  {
+    "ID": "48",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "SAN ISIDRO",
+    "ZIP": "8209",
+    "POP": "22644"
+  },
+  {
+    "ID": "49",
+    "REGION": "REGION XI",
+    "PROVINCE": "DAVAO ORIENTAL",
+    "MUNICIPAL": "TARRAGONA",
+    "ZIP": "8201",
+    "POP": "18998"
+  }
+]

@@ -17,3 +17,48 @@ export const maritalStatusOptions = [
   { value: "divorced", label: "Divorced" },
   { value: "widowed", label: "Widowed" },
 ];
+
+export const provinceOptions = [
+  { value: "none", label: "" },
+  {
+    value: "province 1",
+    label: "",
+    municipality: {
+      value: "",
+      label: "",
+    },
+  },
+  {
+    value: "province 2",
+    label: "",
+    municipality: {
+      value: "",
+      label: "",
+    },
+  },
+  {
+    value: "province 3",
+    label: "",
+    municipality: [
+      {
+        value: "",
+        label: "",
+        barangay: [
+          {
+            value: "",
+            label: "",
+            zip: "",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    value: "province 4",
+    label: "",
+    municipality: {
+      value: "",
+      label: "",
+    },
+  },
+];
